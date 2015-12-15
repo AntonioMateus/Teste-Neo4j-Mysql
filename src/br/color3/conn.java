@@ -5,18 +5,19 @@
  */
 package br.color3;
 //import java.sql.*; Mysql
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.neo4j.jdbc.Driver;
-
 
 public class conn{
     //Connection conn = null; Mysql
     	
-    public static Connection connect() throws SQLException{
+    public static Connection connect() {
 	/* LOGICA ANTIGA 
         GraphDatabaseService conn = new GraphDatabaseFactory().newEmbeddedDatabase("C:/Users/Antonio Mateus/Desktop/Iniciação Cientifica/Iniciação - Fátima/Neo4J/neo4j-enterprise-2.3.0-M02/data/graphTest");
         //System.out.println("Conexao com o BD iniciada"); 
@@ -51,59 +52,27 @@ public class conn{
             System.out.println("Erro ao fechar a conexao");
         }
     }
-    
+    private static String getProperty(String no, String propriedade) {
+        String[] paresPropriedadeValor = no.substring(1, no.length()-1).split(",");
+        for (String par: paresPropriedadeValor) {
+            String[] chaveValor = par.split(":"); 
+            if (chaveValor[0].substring(1, chaveValor[0].length()-1).equals(propriedade)) {
+                if (chaveValor[1].contains("\"")) {
+                    return chaveValor[1].substring(1, chaveValor[1].length()-1);
+                }
+                else {
+                    return chaveValor[1];
+                }
+            }
+        }
+        return null; 
+    }
     public static void main(String[] args) {
-	/* LOGICA ANTIGA
-        String query = "optional match (n:image) return n";
-        GraphDatabaseService conn = connect();
-        ExecutionEngine engine = new ExecutionEngine(conn);
-        ExecutionResult result;
-        
-        try (Transaction tx = conn.beginTx()){
-            result = engine.execute(query);            
-            Iterator<Node> columns = result.columnAs("n");
-            while (columns.hasNext()) {
-                Node image = columns.next();
-                long id = (long) image.getProperty("idImage");
-                String path = (String) image.getProperty("pathImage");
-                System.out.println (id +"   " +path);
-            }
-            tx.success();
-        }
-        catch (NullPointerException n) {
-            System.out.println("Nao tem nenhuma imagem no BD");
-        }
-        finally {
-            disconnect(conn);
-        }*/
-        /* IDEIA MAIS NOVA 
-        IDBAccess conn = connect(); 
-        JcNode imagem = new JcNode("image");
-        JcQuery consulta = new JcQuery(); 
-        consulta.setClauses(new IClause[] {
-            MATCH.node(imagem).label("image"),
-            RETURN.value(imagem)
-        });
-        List<GrNode> imagens = conn.execute(consulta).resultOf(imagem);
-        if (imagens.size() > 0) {
-            for (GrNode img: imagens) {
-                long id = (long) img.getProperty("idImage").getValue();
-                String path = (String) img.getProperty("pathImage").getValue();
-                System.out.println(id +"    " +path);
-            }
-        }
-        else {
-            System.out.println("Nao existe ainda nenhuma imagem no banco de dados");
-        }
-        disconnect(conn);*/
-        String query = "optional match (n:image) return n";
-        Connection conn = null;
+	Connection conn = null;
         try {
             conn = connect();
             Statement stmt = conn.createStatement();
-            stmt.execute("match (n) optional match (n)-[r]-() delete n,r");
-            stmt.execute("create (teste:image {idImage:0, pathImage:'imagem/teste.jpg'})");
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery("match (n:image) return n order by n.idImage limit 10");
             rs.next(); 
             String first = rs.getString("n");
             if (first == null) {
@@ -111,12 +80,10 @@ public class conn{
             }
             else {
                 //System.out.println(first);
-                String[] paresPropriedadeValor = first.substring(1, first.length()-1).split(",");
-                for (String par: paresPropriedadeValor) {
-                    System.out.println(par.split(":")[0]+" = "+par.split(":")[1]);
-                }
+                System.out.println(getProperty(first,"idImage")+" = "+getProperty(first,"pathImage")+" ; ");
                 while (rs.next()) {
-                    System.out.println(rs.getString("n"));
+                    String imagem = rs.getString("n");
+                    System.out.println(getProperty(imagem,"idImage")+" = "+getProperty(imagem,"pathImage")+" ; ");
                 }
             }
         }
@@ -127,6 +94,6 @@ public class conn{
             if (conn != null) {
                 disconnect(conn);
             }
-        }
+        }        
     }
 }

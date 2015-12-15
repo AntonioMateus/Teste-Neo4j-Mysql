@@ -29,39 +29,26 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 public class conn{
     //Connection conn = null; Mysql
     	
-    public static GraphDatabaseService connect(){
-	/* Mysql
-        Connection conn = null;
-	try{
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            String url = "jdbc:mysql://localhost/mydb?user=root&password=dbfx@503_t86";
-            conn = DriverManager.getConnection(url);		    
-	    System.out.println( "Connection opened");
-	}catch(SQLException e){
-            e.printStackTrace();
-	}
-	return conn;*/
+    public static IDBAccess connect(){
+	/* LOGICA ANTIGA 
         GraphDatabaseService conn = new GraphDatabaseFactory().newEmbeddedDatabase("C:/Users/Antonio Mateus/Desktop/Iniciação Cientifica/Iniciação - Fátima/Neo4J/neo4j-enterprise-2.3.0-M02/data/graphTest");
-        //System.out.println("Conexao com o BD iniciada");
-        return conn;
+        //System.out.println("Conexao com o BD iniciada"); 
+        return conn;*/
+        Properties p = new Properties();
+        p.setProperty(DBProperties.SERVER_ROOT_URI, "http://localhost:7476/");
+        IDBAccess remote = DBAccessFactory.createDBAccess(DBType.REMOTE, p, "neo4j", "antonio");
+        return remote;
     }
 		
-    public static void disconnect(GraphDatabaseService conn){
-	/* Mysql
-        try {
-            conn.close();
-            System.out.println("Fechando a conex�o");
-        } catch(SQLException erro) {
-            System.out.println("Erro no fechamento");
-        }*/
+    public static void disconnect(IDBAccess conn){
+	/* LOGICA ANTIGA
         conn.shutdown();
-        //System.out.println("Conexao com o BD encerrada");
+        //System.out.println("Conexao com o BD encerrada"); */
+        conn.close();
     }
     
     public static void main(String[] args) {
-	/* Mysql
-        String query = "Select * from image";
-	connect(query);*/
+	/* LOGICA ANTIGA
         String query = "optional match (n:image) return n";
         GraphDatabaseService conn = connect();
         ExecutionEngine engine = new ExecutionEngine(conn);
@@ -83,6 +70,25 @@ public class conn{
         }
         finally {
             disconnect(conn);
+        }*/
+        IDBAccess conn = connect(); 
+        JcNode imagem = new JcNode("image");
+        JcQuery consulta = new JcQuery(); 
+        consulta.setClauses(new IClause[] {
+            MATCH.node(imagem).label("image"),
+            RETURN.value(imagem)
+        });
+        List<GrNode> imagens = conn.execute(consulta).resultOf(imagem);
+        if (imagens.size() > 0) {
+            for (GrNode img: imagens) {
+                long id = (long) img.getProperty("idImage").getValue();
+                String path = (String) img.getProperty("pathImage").getValue();
+                System.out.println(id +"    " +path);
+            }
         }
+        else {
+            System.out.println("Nao existe ainda nenhuma imagem no banco de dados");
+        }
+        disconnect(conn);
     }
 }

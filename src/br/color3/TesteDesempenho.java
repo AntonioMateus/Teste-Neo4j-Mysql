@@ -42,7 +42,8 @@ public class TesteDesempenho {
             }
             //Comentar abaixo quando precisar voltar para a versão antiga
             double matriz [][] = new double [1001][17];
-            String cypher = "match (a:image)-[r:image_has_feature]->(b:feature) with r.value as value, a.idImage as idImage, b.idFeature as idFeature return value order by idImage, idFeature";
+            //String cypher = "match (a:image)-[r:image_has_feature]->(b:feature) with r.value as value, a.idImage as idImage, b.idFeature as idFeature return value order by idImage, idFeature";
+            String cypher = "match (a:image)-[r:image_has_feature]->(b:feature) return r.value as value order by a.idImage, b.idFeature";
             ResultSet rs = stm.executeQuery(cypher);
             for (int i = 0; i < 1001; i++) {
                 for (int j = 0; j < 17; j++) {
@@ -55,7 +56,9 @@ public class TesteDesempenho {
                 double[] dif = d.calculaDistancia(matriz, id);
                 for (int i = 0; i < 1001; i++) {
                     if (id != i+1) {
-                        stm.execute("match (inicio:image {idImage: "+id+"}) match (fim:image {idImage: "+(i+1)+"}) create (inicio)-[:imgToImg {dist: "+dif[i]+"}]->(fim)");
+                        stm.execute("match (inicio:image {idImage: "+id+"})");
+                        stm.execute("match (fim:image {idImage: "+(i+1)+"})");
+                        stm.execute("create (inicio)-[:imgToImg {dist: "+dif[i]+"}]->(fim)");
                     }
                 }
             }
@@ -263,7 +266,7 @@ public class TesteDesempenho {
                 id = Integer.valueOf(getProperty(image,"idImage"));
                 path = getProperty(image,"pathImage");
             }
-            stm.executeQuery("match (a:image)-[r:imgToImg]->(b:image) where a.idImage = "+id+" with b, r.dist as dist return b order by dist limit " +String.valueOf(quantidadeSemelhantes));
+            stm.executeQuery("match (a:image)-[r:imgToImg]->(b:image) where a.idImage = "+id+" return b order by r.dist limit " +String.valueOf(quantidadeSemelhantes));
         }
         catch (SQLException s) {
             //System.out.println("Houve um problema durante uma das consultas");

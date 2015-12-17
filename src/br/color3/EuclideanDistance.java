@@ -10,12 +10,12 @@ import javax.media.jai.Histogram;
 
 public class EuclideanDistance {
     public double [] calculaDistancia(double[][] matriz, int id){
-	double[] diferenca = new double [24];
+	double[] diferenca = new double [matriz.length];
 	id = id-1;
-	for(int i=0;i <24;i++) {
+	for(int i=0;i <matriz.length;i++) {
             double sum = 0;
             double raiz = 0;
-            for(int j=0;j<16;j++)
+            for(int j=0;j<matriz[0].length;j++)
             {
                 sum = sum + (Math.pow(((matriz[id][j]) - (matriz[i][j])),2));
             }

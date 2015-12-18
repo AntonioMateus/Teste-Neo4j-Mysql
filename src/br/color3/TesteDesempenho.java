@@ -42,7 +42,6 @@ public class TesteDesempenho {
         Connection x = conn.connect();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader("C:\\Users\\Antonio Mateus\\Desktop\\Iniciação Cientifica\\Iniciação - Fátima\\Sistema da Leila\\script_criacao_cypher_aleatorio.txt"));
             //String linhaAtual = null;
             instanteInicio = System.currentTimeMillis();
             Statement stm = x.createStatement(); 
@@ -105,7 +104,7 @@ public class TesteDesempenho {
             for (int i = 0; i < quantidadeImagens; i++) {
                 for (int j = 0; j < 17; j++) {
                     rs.next();
-                    matriz[i][j] = (Double) rs.getDouble("value");
+                    matriz[i][j] = Double.valueOf(rs.getString("value"));
                 }
             }
             EuclideanDistance d = new EuclideanDistance(); 
@@ -118,24 +117,13 @@ public class TesteDesempenho {
                 }
             }
             instanteFim = System.currentTimeMillis();
-        }
-        catch (IOException e) {
-            //System.out.println("Erro ao abrir o script para leitura");
-            e.printStackTrace();
-        }
-        catch (SQLException s) {
+        }       
+        catch (Exception s) {
             //System.out.println("Erro ao realizar uma das consultas");
             s.printStackTrace();
         }
         finally {
-            try {
-                if (br != null) br.close();
-                if (x != null) conn.disconnect(x);                 
-            }
-            catch (IOException ex) {
-                ex.printStackTrace();
-                //System.out.println("Erro ao fechar a leitura do script");
-            }
+            if (x != null) conn.disconnect(x);                 
         }
         double duracao = (double) (instanteFim - instanteInicio)/1000;
         return duracao; 
@@ -362,7 +350,7 @@ public class TesteDesempenho {
             }
             stm.executeQuery("match (a:image)-[r:imgToImg]->(b:image) where a.idImage = "+id+" return b order by r.dist limit " +String.valueOf(quantidadeSemelhantes));
         }
-        catch (SQLException s) {
+        catch (Exception s) {
             s.printStackTrace();
             return 0; 
         }
@@ -401,7 +389,7 @@ public class TesteDesempenho {
     public static void main(String[] args) {
         // TODO code application logic here 
         try {
-            int quantidadeImagens = 501; 
+            int quantidadeImagens = 601; 
             geraValoresAleatorios(quantidadeImagens);
             double[] resultados = new double[22];
             double tempoEstruturasMysql = criaEstruturasMysql();

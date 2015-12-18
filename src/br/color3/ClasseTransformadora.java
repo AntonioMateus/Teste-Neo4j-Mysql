@@ -22,7 +22,8 @@ public class ClasseTransformadora {
      */
     public static void main(String[] args) {
         String caminhoArquivoEntrada = "C:\\Users\\Antonio Mateus\\Documents\\NetBeansProjects\\Color3\\dist\\relatorio_auxiliar.txt";
-        double[][] matrizEntrada = new double[30][22];
+        int quantidadeIteracoes = 1;
+        double[][] matrizEntrada = new double[quantidadeIteracoes][22];
         String linhaAtual = null; 
         try {
             BufferedReader br = new BufferedReader(new FileReader(caminhoArquivoEntrada));
@@ -40,12 +41,12 @@ public class ClasseTransformadora {
             DecimalFormat df = new DecimalFormat("####.##");
             for (int j = 0; j < 22; j++) {
                 double soma = 0; 
-                for (int i = 0; i < 30; i++) {
+                for (int i = 0; i < quantidadeIteracoes; i++) {
                     soma = soma + matrizEntrada[i][j]; 
                 }
-                resultados[j] = df.format(soma/30);
+                resultados[j] = df.format(soma/quantidadeIteracoes);
             }
-            String caminhoArquivoSaida = "C:\\Users\\Antonio Mateus\\Desktop\\Iniciação Cientifica\\Iniciação - Fátima\\teste_comparativo_apos_modificacao(30 iteracoes e 100 imagens semelhantes).csv";
+            String caminhoArquivoSaida = "C:\\Users\\Antonio Mateus\\Desktop\\Iniciação Cientifica\\Iniciação - Fátima\\teste_comparativo_apos_modificacao(1 iteracao, 100 imagens semelhantes e 600 imagens no banco).csv";
             CSVWriter writer = new CSVWriter(new FileWriter(caminhoArquivoSaida),';');
             writer.writeNext(new String[]{"Operacao","quantidade de imagens retornadas","Mysql (em s)","Neo4j (em s)"});
             writer.writeNext(new String[]{"Criacao das estrutruras","nao se aplica",resultados[0],resultados[1]});

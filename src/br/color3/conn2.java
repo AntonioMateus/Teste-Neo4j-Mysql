@@ -13,7 +13,7 @@ public class conn2{
 	Connection conn = null;
 	try{
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/mydb","root","dbfx@503_t86");		    
+            conn = DriverManager.getConnection("jdbc:mysql://localhost/mydb","root","");		    
             //System.out.println("Conexao aberta");                  
 	}catch(SQLException e){
             //e.printStackTrace();
@@ -28,5 +28,22 @@ public class conn2{
         } catch(SQLException erro) {
             //System.out.println("Erro no fechamento");
 	}
+    }
+    
+    public static void main (String args[]) {
+        try {
+            Connection conn = connect(null);
+            if (conn != null) {
+                disconnect(conn);
+                System.out.println("Deu certo !");
+            }
+            else {
+                System.out.println("Conexao nao estabelecida");
+            }
+        }
+        catch (Exception e) {
+            //System.out.println("Deu ruim. Puta merda !");
+            e.printStackTrace(); 
+        }
     }
 }
